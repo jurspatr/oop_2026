@@ -1,71 +1,81 @@
-class Student{
-    constructor(protected mathGrade:number, protected englishGrade:number){}
+// ------------------------------------------------------
+// Student class
+class Student {
+  constructor(
+    protected mathGrade: number,
+    protected englishGrade: number
+  ) {}
 
-    //This method is to show the grades of the student
-    show(): void{
-        console.log(this.mathGrade, this.englishGrade)
-    }
-    //Write a method to calculate the average grade of the student
-    averageGrade(): number{
-        return (this.mathGrade + this.englishGrade) / 2;
-    }
-    //for calculating the average grade of two students
-    /*averageMath(): number{
-        return (s1.mathGrade + s2.mathGrade) / 2;
-    }*/
+  // Show the grades
+  show(): void {
+    console.log("Math:", this.mathGrade, "English:", this.englishGrade);
+  }
 
-    
-    averageMath(count:number): number{
-        return (this.mathGrade + count) / 2;
-    }
+  // Calculate and return the average grade
+  average(): number {
+    return (this.mathGrade + this.englishGrade) / 2;
+  }
 
-    /*averageCoEnglish(): number{
-        return (s1.englishGrade + s2.englishGrade) / 2;
-    } */
-   averageEnglish(count:number): number{
-        return (this.englishGrade + count) / 2;
-    }   
-    //Write a method to add the grades of same subject
-    add(other:Student):Student{
-        return new Student(this.mathGrade + other.mathGrade, 
-            this.englishGrade + other.englishGrade);
-    }
+  // Add grades of the same subjects from another student
+  // Returns a NEW Student object (does not modify originals)
+  add(other: Student): Student {
+    return new Student(
+      this.mathGrade + other.mathGrade,
+      this.englishGrade + other.englishGrade
+    );
+  }
 
-    improveMath():void{
-        this.mathGrade += 5;
-        //this.mathGrade = this.mathGrade+5;
-    }
+  // Calculate average math grade after combining students
+  averageMath(count: number): number {
+    return this.mathGrade / count;
+  }
+
+  // Increase math grade by 5 points (mutates this object)
+  improveMath(): void {
+    this.mathGrade += 5;
+    // this.mathGrade = this.mathGrade + 5;
+  }
 }
 
-let s1: Student=new Student(85, 92);
-let s2: Student=new Student(70, 95)
+// ------------------------------------------------------
+// Create two students
+let s1: Student = new Student(85, 92);
+let s2: Student = new Student(70, 90);
 
-//Array of students
-let Students: Student[] = [
-    new Student(80,97),
-    new Student(75,90),
-]
+// ------------------------------------------------------
+// Array of students (a class group)
+let students: Student[] = [
+  new Student(80, 85),
+  new Student(90, 88),
+  new Student(97, 80),
+  new Student(75, 88)
+];
 
-//Combine all students' grades
-let ClassTotal = Students[0];
+// ------------------------------------------------------
+// Combine all students into one total student
+let classTotal = students[0];
 
-for(let i = 1; i < Students.length; i++){
-    ClassTotal = ClassTotal.add(Students[i])
+for (let i = 1; i < students.length; i++) {
+  classTotal = classTotal.add(students[i]);
 }
 
-//NUMBER OF STUDENTS IN THE CLASS
-const n=Students.length;
-console.log("Class average of maths", ClassTotal.averageMath(n));
-//let s3: Student=new Student(90, 88);
-/* console.log(s1.mathGrade); */
+// Number of students in the class
+const n = students.length;
+
+// Calculate and print class average for math
+console.log("Class average (math):", classTotal.averageMath(n));
+
+// ------------------------------------------------------
+// Test individual student methods
+
 s1.show();
-console.log("Student1's average grade: " + s1.averageGrade());
+console.log("Average of S1:", s1.average());
 
-//Test adding other student grades
-let combined=s1.add(s2)
+// Test adding two students
+let combined = s1.add(s2);
 combined.show();
-console.log("S1 and S2 combined average english grade: " + combined.averageEnglish(n));
-console.log("S1 and S2 combined average math grade: " + combined.averageMath(n));
+console.log("Average of both students (math):", combined.averageMath(2));
 
+// Improve math grade of student 1
 s1.improveMath();
 s1.show();
