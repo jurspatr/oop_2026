@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThirdExample</title>
+    <script src="03_resistor.js"></script>
+    <script>
+        let r1;
+        function startPage(){
+            let canvas=document.getElementById("canvas1");
+            let ctx=canvas.getContext("2d");
+            r1=new Resistor2(120,ctx,250,350,100);
+            r2=new Resistor2(140,ctx,250,350,200);
+
+
+            //during the page load: Make the slider match the resistor value
+            document.getElementById("range1").value=String(r1.getR());
+            //During the page load: make the span value match to resistor value
+            document.getElementById("val1").innerText=r1.getR();
+            //during the page load: Make the slider match the resistor value
+            document.getElementById("range1").value=String(r2.getR());
+            //During the page load: make the span value match to resistor value
+            document.getElementById("val2").innerText=r2.getR();
+        }
+
+        function onRange1(input){
+            const v=input.valueAsNumber;
+            r1.setR(v);
+            document.getElementById("val1").innerText=v;
+        }
+        function onRange2(input){
+            const v=input.valueAsNumber;
+            r2.setR(v);
+            document.getElementById("val2").innerText=v;
+        }
+    </script>
+</head>
+<body onload="startPage()">
+    <canvas id="canvas1" width="400" height="300"></canvas>
+    <input type="range" id="range1" min="100" max="1000" oninput="onRange1(this)"/>   
+    <span id="val1"></span>Ω 
+    <input type="range" id="range2" min="100" max="1000" oninput="onRange2(this)"/>    
+    <span id="val2"></span>Ω
+</body>
+</html>
