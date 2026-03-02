@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polygon</title>
+    <script src="02_polygon.js"></script>
+    <script>
+        function start() {
+            const canvas = document.getElementById("board1");
+            const ctx = canvas.getContext("2d");
+            let p1 = new Polygon([50, 30, 40],[40, 30, 50]);
+            let p2 = new Polygon([150, 300, 250],[120, 40, 260]);
+            p1.draw(ctx);
+            p2.draw(ctx);
+        }
+    </script>
+</head>
+
+<body onload="start()">
+
+    <canvas id="board1" height="300" width="400"></canvas>
+
+</body>
+
+</html>
+

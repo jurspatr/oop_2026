@@ -41,3 +41,4 @@ for (var _a = 0, tickets_2 = tickets; _a < tickets_2.length; _a++) {
 console.log(("\nI would like to buy 2 adult tickets, 2 pensioner tickets, 1 child ticket and 1 student ticket please!"));
 //price of purchase also taking into consideration the day
 console.log("\nOf course, the total price will be: ", (2 * tickets[0].crazy + 2 * tickets[3].crazy + 1 * tickets[2].crazy + 1 * tickets[1].crazy).toFixed(2), ",since it is tuesday!");
+console.log("\nOf course, the total price will be: ", (2 * tickets[0].normal + 2 * tickets[3].normal + 1 * tickets[2].normal + 1 * tickets[1].normal).toFixed(2), ",since it is tuesday!");

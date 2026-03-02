@@ -1,6 +1,6 @@
 // Homework 1
 // Arvuta jooksu tempo (min/km)
-function calculatePace(distanceKm, timeMinutes) {
+function calculatePace(distanceKm: number, timeMinutes: number) {
     //tempo kümnendvormis (minutit kilomeetri kohta)
     var totalPace = timeMinutes / distanceKm;
     //eraldan täisminutid
