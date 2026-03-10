@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="homework5.js"></script>
+    <script>
+        let calculators = [];
+
+        function startPage(){
+            //first calculator object
+            calculators[0] = new EurToDollar();
+            calculators[1] = new EurToPound();
+            calculators[2] = new DollarToPound();
+            calculators[3] = new DollarToEur();
+            calculators[4] = new PoundToDollar();
+            calculators[5] = new PoundToEur();
+            activateCalculator();
+        }
+
+        function activateCalculator(){
+            //get dropdown element
+            const select = document.getElementById("calculatorSelect");
+            //we ask which option is selected
+            const idx=select.selectedIndex;
+            //pick the calculator object from the array
+            const calc=calculators[idx];
+            const type1 =document.getElementById("type1");
+            const type2 =document.getElementById("type2");
+            const answer=document.getElementById("answer");
+            type1.innerText = calc.inputUnit();
+            type2.innerText = calc.outputUnit();
+            answer.innerText="";
+            const input = document.getElementById("input1");
+            input.value="";
+
+        }
+
+        function buttonClick(){
+            //Get dropdown element
+            const select = document.getElementById("calculatorSelect");
+            // Get input element
+            const input = document.getElementById("input1");
+            //get the answer element
+            const answer=document.getElementById("answer");
+            //we pick the correct calculator object
+            const calc =calculators[select.selectedIndex];
+            //Read numeric value.
+            const value=input.valueAsNumber;
+
+            if (isNaN(value)) {
+                answer.innerText = "";
+                return;
+            }
+
+            answer.innerText = calc.calculate(value).toFixed(2);
+
+        }
+
+    </script>
+</head>
+<body onload="startPage()">
+    <input type="number" placeholder="Input an amount" id="input1" onchange="buttonClick()">
+    <!-- This is to display the input unit-->
+    <span id="type1"></span>
+    <input type="button" value="=" onclick="buttonClick()"/>&nbsp;
+    <span id="answer"></span>
+    <span id="type2"></span><br>
+
+    <select id="calculatorSelect" onchange="activateCalculator()">
+        <option value=""> Euros(€) to dollars($) </option>
+        <option value=""> Euros(€) to pounds(£) </option>
+        <option value=""> Dollars($) to pounds(£) </option>
+        <option value=""> Dollars($) to euros(€) </option>
+        <option value=""> Pounds(£) to dollars($) </option>
+        <option value=""> Pounds(£) to euros(€) </option>
+    </select>
+    
+</body>
+</html>

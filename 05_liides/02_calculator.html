@@ -18,6 +18,15 @@
             type2.innerText = c1.outPutUnit();
         }
 
+        function buttonClick(){
+            const input = document.getElementById("input1")
+            const answer = document.getElementById("answer");
+            const value = input.valueAsNumber;
+
+            answer.innerText = c1.calculate(value).toFixed(2);
+
+        }
+
     
     </script>
 </head>
