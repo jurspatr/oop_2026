@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TS Calculator</title>
+    
+    <script>
+        var exports = {};
+    </script>
+
+    <script src="03_calculator.js"></script>
+
+    <script>
+        let calcobj = null;
+
+        function startPage() {
+            calcobj = new Calculator();
+            updateDisplay();
+        }
+
+        function buttonPress(ev) {
+            calcobj.pressButton(ev.target.value);
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById("panel1");
+            display.innerText = calcobj.getPanelContent() || "0";
+        }
+    </script>
+
+    <style>
+        input[type=button] { width: 50px; height: 40px; margin: 2px; cursor: pointer; }
+        #panel1 { 
+            width: 165px; 
+            height: 30px; 
+            line-height: 30px; 
+            margin-bottom: 10px; 
+            border: 2px solid #333; 
+            text-align: right; 
+            padding-right: 5px;
+            font-family: monospace;
+            background: #f4f4f4;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body onload="startPage()">
+    <div id="panel1"></div>
+    
+    <input type="button" value="1" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <input type="button" value="2" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <input type="button" value="3" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <br>
+    <input type="button" value="4" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <input type="button" value="5" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <input type="button" value="6" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <br>
+    <input type="button" value="7" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <input type="button" value="8" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <input type="button" value="9" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <br>
+    <input type="button" value="+" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <input type="button" value="0" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <input type="button" value="-" onclick="buttonPress(event)" style="border-radius: 20px;">
+    <br>
+    <input type="button" value="C" onclick="buttonPress(event)" style="color: red; border-radius: 20px;">
+    <input type="button" value="=" onclick="buttonPress(event)" style="width: 110px; background: #d4ffd4; border-radius: 20px;">
+
+</body>
+</html>
