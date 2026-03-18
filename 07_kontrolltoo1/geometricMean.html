@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Geometric Mean Calculator</title>
+</head>
+<body>
+
+<h1>Geometric Mean Calculator</h1>
+
+<!-- 1 -->
+<h3>1. Square Root</h3>
+<input id="num1" type="number" placeholder="First number"><br>
+<input id="num2" type="number" placeholder="Second number"><br>
+
+<!-- 2 -->
+<h3>2. Array of numbers, n-th root</h3>
+<input id="arrayInput" type="text" placeholder="2,5,7,10"><br>
+
+<!-- 3 -->
+<h3>3. Salary</h3>
+<input id="salary" type="number" placeholder="Salary"><br>
+<input id="coeff" type="number" placeholder="Coefficient"><br><br>
+
+<button onclick="calculate()">Calculate</button>
+
+<h3>Result:</h3>
+<p id="result"></p>
+
+<h3>Salary History:</h3>
+<ul id="history"></ul>
+
+<script src="geoMean.js"></script>
+
+<script>
+function calculate() {
+    const gm = new GeometricMean();
+
+    // 1. Square root
+    const n1 = parseFloat(document.getElementById("num1").value);
+    const n2 = parseFloat(document.getElementById("num2").value);
+
+    let res1;
+    if (isNaN(n1) || isNaN(n2)) {
+        res1 = "Invalid input";
+    } else {
+        res1 = gm.squareRoot(n1, n2);
+    }
+
+    // 2. Geometric mean
+    const arrInput = document.getElementById("arrayInput").value;
+    const parts = arrInput.split(",");
+    let arr = [];
+
+    for (let i = 0; i < parts.length; i++) {
+        let num = parseFloat(parts[i]);
+        if (!isNaN(num)) {
+            arr.push(num);
+        }
+    }
+
+    let res2;
+    if (arr.length === 0) {
+        res2 = "Invalid input";
+    } else {
+        res2 = gm.sqrtArr(arr);
+    }
+
+    // 3. Salary
+    const salary = parseFloat(document.getElementById("salary").value);
+    const coeff = parseFloat(document.getElementById("coeff").value);
+
+    let res3;
+    if (isNaN(salary) || isNaN(coeff)) {
+        res3 = "Invalid input";
+    } else {
+        let newSalary = salary * gm.updateCoeff(coeff);
+        res3 = newSalary.toFixed(2);
+
+        // add to history
+        let historyList = document.getElementById("history");
+
+        let li = document.createElement("li");
+        li.textContent = res3;
+
+        historyList.appendChild(li);
+    }
+
+    document.getElementById("result").innerHTML =
+        "Square root: " + res1 + "<br>" +
+        "Geometric mean: " + res2 + "<br>" +
+        "New salary: " + res3;
+}
+</script>
+
+</body>
+</html>
