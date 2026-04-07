@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TS Notes App</title>
+
+    <script>
+        var exports = {};
+    </script>
+
+    <script src="homework_6.js"></script>
+
+    <script>
+        let app = null;
+
+        function startPage() {
+            app = new Notes();
+            updateList();
+        }
+
+        function addNote() {
+            const textarea = document.getElementById("noteInput");
+            app.addNote(textarea.value);
+            textarea.value = "";
+            updateList();
+        }
+
+        function clearAllNotes() {
+            app.clearAll();
+            updateList();
+        }
+
+        function updateList() {
+            const list = document.getElementById("notesList");
+            const notes = app.getNotes();
+
+            list.innerHTML = "";
+
+            // If there are no notes in the array Create a new <li> element
+            if (notes.length === 0) {
+                const emptyItem = document.createElement("li");
+                // Put the text "No notes yet." inside the <li>
+                emptyItem.innerText = "No notes yet.";
+                // Center the text inside this <li>
+                emptyItem.style.textAlign = "center";
+                // Add this <li> into the list element
+                list.appendChild(emptyItem);
+                // Stop the function here, because there are no notes to show
+                return;
+            }
+            // Loop through all notes one by one
+            for (let i = 0; i < notes.length; i++) {
+                // Create a new <li> for one note
+                const li = document.createElement("li");
+                li.className = "note-item";
+                // Create a <span> to hold the note text
+                const span = document.createElement("span");
+                span.className = "note-text";
+                // Put the current note text into the <span>
+                span.innerText = notes[i];
+                // Create a button for deleting this note
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "delete-btn";
+                // Set the text shown on the button
+                deleteBtn.innerText = "Delete";
+                // Add a click function to this button
+                deleteBtn.onclick = function () {
+                    // Delete the note at position i
+                    app.deleteNote(i);
+                    // Draw the updated note list again after deleting
+                    updateList();
+                };
+                // Put the note text inside the <li>
+                li.appendChild(span);
+                // Put the delete button inside the <li>
+                li.appendChild(deleteBtn);
+                // Add the finished <li> into the main list
+                list.appendChild(li);
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #eaeaea;
+        }
+
+
+
+        .notes-box {
+            width: 360px;
+            padding: 20px;
+            border: 2px solid #333;
+            background: #f4f4f4;
+        }
+
+        h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 2px solid #333;
+            border-radius: 12px;
+            resize: none;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+
+
+        .add-btn {
+            background: #d4ffd4;
+        }
+
+        .clear-btn {
+            background: lightcoral;
+        }
+
+
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .note-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .note-text {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .delete-btn:hover {
+            background: #ff9999;
+        }
+    </style>
+</head>
+
+<body onload="startPage()">
+    <div class="page">
+        <div class="notes-box">
+            <h2>My Notes</h2>
+
+            <textarea id="noteInput" placeholder="Write your note here..."></textarea>
+
+            <div class="buttons">
+                <button class="add-btn" onclick="addNote()">Add Note</button>
+                <button class="clear-btn" onclick="clearAllNotes()">Clear All</button>
+            </div>
+
+            <ul id="notesList"></ul>
+        </div>
+    </div>
+</body>
+
+</html>
