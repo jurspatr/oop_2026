@@ -8,15 +8,15 @@ abstract class AbstractAnimal {
         this.age = age;
     }
 
-    // Abstract method
+    // method make a sound
     abstract makeSound(): string;
 
-    // Normal method shared by all animals
+    // method shared by all animals
     move(): string {
         return this.name + " is moving.";
     }
 
-    // Normal method shared by all animals
+    // method shared by all animals
     getInfo(): string {
         return this.name + " is " + this.age + " years old.";
     }
@@ -31,12 +31,12 @@ abstract class PetAnimal extends AbstractAnimal {
         this.owner = owner;
     }
 
-    // Normal method for all pet animals
+    // method for all pet animals
     getOwner(): string {
         return this.name + "'s owner is " + this.owner + ".";
     }
 
-    // Another abstract method
+    // Another method
     abstract favoriteActivity(): string;
 }
 

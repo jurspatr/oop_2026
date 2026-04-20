@@ -19,11 +19,11 @@ var AbstractAnimal = /** @class */ (function () {
         this.name = name;
         this.age = age;
     }
-    // Normal method shared by all animals
+    // method shared by all animals
     AbstractAnimal.prototype.move = function () {
         return this.name + " is moving.";
     };
-    // Normal method shared by all animals
+    // method shared by all animals
     AbstractAnimal.prototype.getInfo = function () {
         return this.name + " is " + this.age + " years old.";
     };
@@ -37,7 +37,7 @@ var PetAnimal = /** @class */ (function (_super) {
         _this.owner = owner;
         return _this;
     }
-    // Normal method for all pet animals
+    // method for all pet animals
     PetAnimal.prototype.getOwner = function () {
         return this.name + "'s owner is " + this.owner + ".";
     };
@@ -85,7 +85,6 @@ var Parrot = /** @class */ (function (_super) {
     };
     return Parrot;
 }(PetAnimal));
-// Demo program
 var dog1 = new Dog("Bosse", 3, "Kevin");
 var cat1 = new Cat("Sofi", 5, "Patrick");
 var parrot1 = new Parrot("Cooper", 2, "Mark");

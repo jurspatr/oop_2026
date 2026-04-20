@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Viking Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4efe6;
+      color: #222;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .box {
+      background: white;
+      border: 2px solid #b68b4c;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      color: #7a5321;
+    }
+
+    .answers, .lifelines {
+      display: grid;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #999;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #fafafa;
+    }
+
+    button:hover {
+      background: #eee;
+    }
+
+    .removed {
+      background: #ddd;
+      text-decoration: line-through;
+      cursor: not-allowed;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Viking Quiz</h1>
+    <p id="question">Which alphabet did the Vikings use?</p>
+
+    <div id="answers" class="answers"></div>
+
+    <h2>Lifelines</h2>
+    <div class="lifelines">
+      <button id="shieldBtn">Shield</button>
+      <button id="swordBtn">Sword</button>
+      <button id="knifeBtn">Knife</button>
+      <button id="spearBtn">Spear</button>
+      <button id="goldBtn">Gold</button>
+    </div>
+
+    <p id="inventory"></p>
+    <p id="message">Choose an answer.</p>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

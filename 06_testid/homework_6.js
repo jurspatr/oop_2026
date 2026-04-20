@@ -5,7 +5,6 @@ var Notes = /** @class */ (function () {
     function Notes() {
         // This array stores all notes as strings
         this.notes = [];
-        // No loading is needed, because notes are only kept in memory
     }
     // Adds a new note to the list
     Notes.prototype.addNote = function (note) {
