@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade calculator</title>
+    <script src="homework_10.js"></script>
+</head>
+<body>
+    <h1>Grade calculator</h1>
+
+    <label>Student name:</label>
+    <input type="text" id="studentName"><br><br>
+
+    <label>1. grade:</label>
+    <input type="number" id="grade1" min="1" max="5"><br><br>
+
+    <label>2. grade:</label>
+    <input type="number" id="grade2" min="1" max="5"><br><br>
+
+    <label>3. grade:</label>
+    <input type="number" id="grade3" min="1" max="5"><br><br>
+
+    <button onclick="calculateGrades()">Calculate grades</button>
+
+    <h2 id="output"></h2>
+</body>
+</html>
