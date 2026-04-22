@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Simulation</title>
+
+    <script src="tempSim.js"></script>
+    <script>
+        let water = null;
+        let iron = null;
+        let air = null;
+
+        function startPage() {
+            document.getElementById("output").innerText = "Fill the fields and press a button";
+        }
+
+        function calculateWaterAndIron() {
+            const waterMass = document.getElementById("waterMass").valueAsNumber;
+            const waterTemp = document.getElementById("waterTemp").valueAsNumber;
+            const ironMass = document.getElementById("ironMass").valueAsNumber;
+            const ironTemp = document.getElementById("ironTemp").valueAsNumber;
+            const energy = document.getElementById("energy").valueAsNumber;
+
+            if (isNaN(waterMass) || isNaN(waterTemp) || isNaN(ironMass) || isNaN(ironTemp) || isNaN(energy)) {
+                document.getElementById("output").innerText = "Please fill all the water, iron, and energy fields";
+                return;
+            }
+
+            water = new MaterialAmount(waterMass, 4200, waterTemp);
+            iron = new MaterialAmount(ironMass, 412, ironTemp);
+
+            water.changeEnergy(energy);
+            iron.changeEnergy(energy);
+
+            document.getElementById("output").innerText =
+                "Water temperature: " + water.getTemperature().toFixed(2) + "°C\n" +
+                "Iron temperature: " + iron.getTemperature().toFixed(2) + "°C";
+        }
+
+        function transferEnergy() {
+            if (!water || !iron) {
+                document.getElementById("output").innerText = "Please calculate water and iron first";
+                return;
+            }
+
+            if (iron.getTemperature() > water.getTemperature()) {
+                iron.changeEnergy(-1000);
+                water.changeEnergy(1000);
+
+                document.getElementById("output").innerText =
+                    "After transfer:\n" +
+                    "Water temperature: " + water.getTemperature().toFixed(2) + "°C\n" +
+                    "Iron temperature: " + iron.getTemperature().toFixed(2) + "°C";
+            } else {
+                document.getElementById("output").innerText =
+                    "No transfer needed.\n" +
+                    "Water temperature: " + water.getTemperature().toFixed(2) + "°C\n" +
+                    "Iron temperature: " + iron.getTemperature().toFixed(2) + "°C";
+            }
+        }
+
+        function createAir() {
+            const length = document.getElementById("length").valueAsNumber;
+            const width = document.getElementById("width").valueAsNumber;
+            const height = document.getElementById("height").valueAsNumber;
+            const airTemp = document.getElementById("airTemp").valueAsNumber;
+
+            if (isNaN(length) || isNaN(width) || isNaN(height) || isNaN(airTemp)) {
+                document.getElementById("output").innerText = "Please fill all the air fields";
+                return;
+            }
+
+            air = new AirAmount(length, width, height, airTemp);
+
+            document.getElementById("output").innerText =
+                "Air created.\n" +
+                "Air temperature: " + air.getTemperature().toFixed(2) + "°C";
+        }
+
+        function calculateEqualTemp() {
+            if (!water || !iron || !air) {
+                document.getElementById("output").innerText = "Please create water, iron, and air first";
+                return;
+            }
+
+            const finalTemperature = equalTemperature([water, iron, air]);
+
+            document.getElementById("output").innerText =
+                "Equal temperature: " + finalTemperature.toFixed(2) + "°C";
+        }
+    </script>
+</head>
+<body onload="startPage()">
+    <h1>Temperature Simulation</h1>
+
+    <label>Water mass (kg): </label>
+    <input type="number" id="waterMass"><br><br>
+
+    <label>Water temperature (°C): </label>
+    <input type="number" id="waterTemp"><br><br>
+
+    <label>Iron mass (kg): </label>
+    <input type="number" id="ironMass"><br><br>
+
+    <label>Iron temperature (°C): </label>
+    <input type="number" id="ironTemp"><br><br>
+
+    <label>Energy to add (J): </label>
+    <input type="number" id="energy"><br><br>
+
+    <input type="button" value="Calculate" onclick="calculateWaterAndIron()"><br><br>
+    <input type="button" value="Transfer 1000 J" onclick="transferEnergy()"><br><br>
+
+    <label>Room length (m): </label>
+    <input type="number" id="length"><br><br>
+
+    <label>Room width (m): </label>
+    <input type="number" id="width"><br><br>
+
+    <label>Room height (m): </label>
+    <input type="number" id="height"><br><br>
+
+    <label>Air temperature (°C): </label>
+    <input type="number" id="airTemp"><br><br>
+
+    <input type="button" value="Create Air" onclick="createAir()"><br><br>
+    <input type="button" value="Calculate Equal Temperature" onclick="calculateEqualTemp()"><br><br>
+
+    <pre id="output"></pre>
+</body>
+</html>

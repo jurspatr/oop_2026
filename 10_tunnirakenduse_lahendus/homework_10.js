@@ -47,7 +47,7 @@ function calculateGrades() {
     }
     var calculator = new GradeCalculator(studentName, grade1, grade2, grade3);
     output.innerText =
-        "".concat(calculator.studentName, " sum of the grades is ").concat(calculator.getSum(), ". ") +
+        "".concat(calculator.studentName, " your sum of the grades is ").concat(calculator.getSum(), ". ") +
             "Average grade is ".concat(calculator.getAverage().toFixed(2), ". ") +
             "".concat(calculator.getResult(), ".");
 }
