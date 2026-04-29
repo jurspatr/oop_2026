@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        let library =null;
+        let exports = {};
+        function startPage(){
+            library = new Library();
+            showItems();
+        }
+        function updateForm(){
+            const type = document.getElementById("type").value;
+            document.getElementById("book-fields").style.display = type === "book"?"":"none";
+            document.getElementById("dvd-fields").style.display = type === "dvd"?"":"none";
+
+        }
+        function addItem(){
+            const type = document.getElementById("type").value;
+            let item;
+            try{
+                if (type === "book"){
+                    item = new Book(
+                        document.getElementById("id").value,
+                        document.getElementById("title").value,
+                        document.getElementById("author").value,
+                        Number(document.getElementById("year").value),
+                        Number(document.getElementById("pages").value),
+                        document.getElementById("ISBN").value,
+                    );
+                } else {
+                    item = new DVD(
+                        document.getElementById("id").value,
+                        document.getElementById("title").value,
+                        document.getElementById("author").value,
+                        Number(document.getElementById("year").value),
+                        Number(document.getElementById("duration").value),
+                    )
+                }
+                library.addItem(item);
+                showItems()
+            } catch (e){
+                alert("Error adding item: " + e.message);
+            }
+        }
+        function showItems(){
+            const out = document.getElementById("output");
+            out.innerHTML = "";
+            const items = library.getAll();
+            if(items.length === 0){
+                out.innerText = "(No items)"; return;
+            }
+            items.forEach(item =>{
+                const div = document.createElement("div");
+                div.textContent=item.getSummary();
+                out.appendChild(div)
+            });
+        }
+        function loadFile(){}
+        function download(){}
+        //Expose functions to HTML buttons
+        window.startPage=startPage;
+        window.addItem=addItem;
+        window.showItems=showItems;
+        window.loadFile=loadFile;
+        window.download=download;
+        window.updateForm=updateForm;
+    </script>
+    <script src="Library.js"></script>
+</head>
+<body onload="startPage()">
+    <h1>Library system</h1>
+    <hr>
+    <h3>Upload files</h3>
+    <input type="file" id="fileInput">
+    <button onclick="loadFile()">load</button>
+    <hr>
+    <h3>Add Item</h3>
+    <label>Type:</label>
+    <select id="type" onchange="updateForm()">
+        <option value="book">Book</option>
+        <option value="dvd">DVD</option>
+    </select>
+
+    <br><br>
+    <input id="id" placeholder="ID">
+    <input id="title" placeholder="Title">
+    <input id="author" placeholder="Author">
+    <input id="year" placeholder="Year">
+
+    <!--book-->
+    <span id="book-fields">
+        <input id="pages" type="number" placeholder="Pages">
+        <input id="ISBN" placeholder="ISBN">
+    </span>
+    <!--DVD-->
+    <span id="dvd-fields" style="display: none">
+        <input id="duration" type="number" placeholder="Duration">
+    </span>
+
+    <br><br>
+    <button onclick="addItem()">Add Item</button>
+
+    <hr>
+    <h3>Items</h3>
+    <button onclick="showItems()">Refresh</button>
+    <div id="output" style="font-family:monospace"></div>
+
+    <hr>
+    <h3>Download</h3>
+    <button onclick="download()">Download</button>
+
+</body>
+</html>
