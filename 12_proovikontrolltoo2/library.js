@@ -1,4 +1,3 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -14,14 +13,26 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Library = exports.DVD = exports.Book = exports.LibraryItem = void 0;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var LibraryItem = /** @class */ (function () {
     function LibraryItem(id, title, author, year) {
-        //Removes the whitespaces from both ends of the string
-        //=== checking whether this is empty after removing spaces
         if (id.trim() === "")
-            throw new Error("ID cannot be emprty");
+            throw new Error("ID cannot be empty");
+        if (title.trim() === "")
+            throw new Error("Title cannot be empty");
+        if (author.trim() === "")
+            throw new Error("Author or director cannot be empty");
+        if (!Number.isInteger(year) || year < 1000 || year > 3000) {
+            throw new Error("Year must be between 1000 and 3000");
+        }
         this.id = id;
         this.title = title;
         this.author = author;
@@ -31,105 +42,109 @@ var LibraryItem = /** @class */ (function () {
     LibraryItem.prototype.getTitle = function () { return this.title; };
     LibraryItem.prototype.getAuthor = function () { return this.author; };
     LibraryItem.prototype.getYear = function () { return this.year; };
-    LibraryItem.prototype.getSummary = function () { return "[Item] ".concat(this.title); };
+    LibraryItem.prototype.getSummary = function () {
+        return "[Item] ".concat(this.title);
+    };
     return LibraryItem;
 }());
-exports.LibraryItem = LibraryItem;
-//-------------------------------Book------------------------------------
 var Book = /** @class */ (function (_super) {
     __extends(Book, _super);
-    function Book(id, title, author, year, pages, ISBN) {
+    function Book(id, title, author, year, pages, genre) {
         var _this = _super.call(this, id, title, author, year) || this;
-        if (pages <= 0)
-            throw new Error("Pages must be positive");
+        if (!Number.isInteger(pages) || pages <= 0) {
+            throw new Error("Pages must be a positive number");
+        }
+        if (genre.trim() === "") {
+            throw new Error("Genre cannot be empty");
+        }
         _this.pages = pages;
-        _this.ISBN = ISBN;
+        _this.genre = genre;
         return _this;
     }
     Book.prototype.getSummary = function () {
-        return "[Book] ".concat(this.title, " (").concat(this.year, ")");
+        return "[Book] ".concat(this.id, " | ").concat(this.title, " | ").concat(this.author, " | ").concat(this.year, " | ").concat(this.pages, " pages | ").concat(this.genre);
     };
-    //This method convert the Book object into a text line (for saving)
-    //Here each property is seperated by | so we can read it easily later
-    Book.prototype.toFillLine = function () {
-        return "[Book]|".concat(this.id, "|").concat(this.title, "|").concat(this.author, "|(").concat(this.year, ")|").concat(this.pages, "|").concat(this.ISBN);
+    Book.prototype.toFileLine = function () {
+        return "BOOK|".concat(this.id, "|").concat(this.title, "|").concat(this.author, "|").concat(this.year, "|").concat(this.pages, "|").concat(this.genre);
     };
     return Book;
 }(LibraryItem));
-exports.Book = Book;
-//----------------------------DVD---------------------------------------------
 var DVD = /** @class */ (function (_super) {
     __extends(DVD, _super);
     function DVD(id, title, director, year, duration) {
         var _this = _super.call(this, id, title, director, year) || this;
-        if (duration <= 0)
-            throw new Error("Duration must be positive");
+        if (!Number.isInteger(duration) || duration <= 0) {
+            throw new Error("Duration must be a positive number");
+        }
         _this.duration = duration;
         return _this;
     }
     DVD.prototype.getSummary = function () {
-        return "[DVD] ".concat(this.title, " (").concat(this.year, ")");
+        return "[DVD] ".concat(this.id, " | ").concat(this.title, " | ").concat(this.author, " | ").concat(this.year, " | ").concat(this.duration, " min");
     };
-    DVD.prototype.toFillLine = function () {
-        return "[DVD]|".concat(this.id, "|").concat(this.title, "|").concat(this.author, "|(").concat(this.year, ")|").concat(this.duration);
+    DVD.prototype.toFileLine = function () {
+        return "DVD|".concat(this.id, "|").concat(this.title, "|").concat(this.author, "|").concat(this.year, "|").concat(this.duration);
     };
     return DVD;
 }(LibraryItem));
-exports.DVD = DVD;
-//---------------------------------Library-------------------
-//Manage all the items
 var Library = /** @class */ (function () {
     function Library() {
         this.items = [];
-    } //starts with a empty list
-    //add a new item to the library
+    }
     Library.prototype.addItem = function (item) {
+        if (this.items.some(function (existing) { return existing.getId() === item.getId(); })) {
+            throw new Error("Item with ID ".concat(item.getId(), " already exists"));
+        }
         this.items.push(item);
     };
     Library.prototype.getAll = function () {
-        return this.items;
+        return __spreadArray([], this.items, true);
+    };
+    Library.prototype.search = function (query) {
+        var q = query.trim().toLowerCase();
+        if (q === "") {
+            return this.getAll();
+        }
+        return this.items.filter(function (item) {
+            return item.getSummary().toLowerCase().includes(q);
+        });
     };
     Library.prototype.toText = function () {
-        //map is an array method, it takes each item and transform it
-        //i: each item in the array
-        //i.toFillLine converts object-string
-        return this.items.map(function (i) { return i.toFillLine(); }).join("\n");
-        //\n mean new line
-        // join("\n") : mean join everything with line breaks
+        return this.items.map(function (item) { return item.toFileLine(); }).join("\n");
     };
-    //Covert text to objects, because we need to read item details from text files
     Library.prototype.loadFromText = function (text) {
-        var lines = text.split("\n");
+        var lines = text.split(/\r?\n/);
         var errors = [];
         for (var _i = 0, lines_1 = lines; _i < lines_1.length; _i++) {
-            var line = lines_1[_i];
+            var rawLine = lines_1[_i];
+            var line = rawLine.trim();
+            if (line === "")
+                continue;
             try {
                 var parts = line.split("|");
                 if (parts[0] === "BOOK") {
-                    this.addItem(new Book(parts[1], parts[2], parts[3], Number(parts[4]), Number(parts[5]), parts[6]));
+                    if (parts.length !== 7) {
+                        throw new Error("Invalid BOOK format");
+                    }
+                    var book = new Book(parts[1], parts[2], parts[3], Number(parts[4]), Number(parts[5]), parts[6]);
+                    this.addItem(book);
                 }
                 else if (parts[0] === "DVD") {
-                    this.addItem(new DVD(parts[1], parts[2], parts[3], Number(parts[4]), Number(parts[5])));
+                    if (parts.length !== 6) {
+                        throw new Error("Invalid DVD format");
+                    }
+                    var dvd = new DVD(parts[1], parts[2], parts[3], Number(parts[4]), Number(parts[5]));
+                    this.addItem(dvd);
+                }
+                else {
+                    throw new Error("Unknown item type");
                 }
             }
             catch (e) {
-                errors.push("Error" + line);
+                errors.push("Error in line: ".concat(line));
             }
         }
         return errors;
     };
     return Library;
 }());
-exports.Library = Library;
-var item1 = new LibraryItem("1", "Generic item", "unknown", 2020);
-console.log(item1);
-var book1 = new Book("2B", "Harry Potter", "J.K rowling", 1990, 300, "334445");
-var book2 = new Book("3B", "The hobbit", "J.R.R Tolkien", 1937, 300, "554445");
-console.log(book1);
-console.log(item1.getSummary());
-console.log(book1.getSummary());
-console.log(book1.toFillLine());
-var lib = new Library();
-lib.addItem(book1);
-lib.addItem(book2);
-console.log(lib.toText());

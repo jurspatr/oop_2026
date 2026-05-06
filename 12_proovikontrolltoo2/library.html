@@ -3,80 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Library System</title>
+
+    <script src="library.js"></script>
+
     <script>
-        let library =null;
-        let exports = {};
-        function startPage(){
+        let library = null;
+
+        function startPage() {
             library = new Library();
+            updateForm();
             showItems();
         }
-        function updateForm(){
-            const type = document.getElementById("type").value;
-            document.getElementById("book-fields").style.display = type === "book"?"":"none";
-            document.getElementById("dvd-fields").style.display = type === "dvd"?"":"none";
 
+        function updateForm() {
+            const type = document.getElementById("type").value;
+            document.getElementById("book-fields").style.display = type === "book" ? "" : "none";
+            document.getElementById("dvd-fields").style.display = type === "dvd" ? "" : "none";
         }
-        function addItem(){
+
+        function addItem() {
             const type = document.getElementById("type").value;
             let item;
-            try{
-                if (type === "book"){
+
+            try {
+                if (type === "book") {
                     item = new Book(
                         document.getElementById("id").value,
                         document.getElementById("title").value,
                         document.getElementById("author").value,
                         Number(document.getElementById("year").value),
                         Number(document.getElementById("pages").value),
-                        document.getElementById("ISBN").value,
+                        document.getElementById("genre").value
                     );
                 } else {
                     item = new DVD(
                         document.getElementById("id").value,
                         document.getElementById("title").value,
-                        document.getElementById("author").value,
+                        document.getElementById("director").value,
                         Number(document.getElementById("year").value),
-                        Number(document.getElementById("duration").value),
-                    )
+                        Number(document.getElementById("duration").value)
+                    );
                 }
+
                 library.addItem(item);
-                showItems()
-            } catch (e){
+                clearForm();
+                showItems();
+            } catch (e) {
                 alert("Error adding item: " + e.message);
             }
         }
-        function showItems(){
+
+        function showItems(items = null) {
             const out = document.getElementById("output");
             out.innerHTML = "";
-            const items = library.getAll();
-            if(items.length === 0){
-                out.innerText = "(No items)"; return;
+
+            const list = items ?? library.getAll();
+
+            if (list.length === 0) {
+                out.innerText = "(No items)";
+                return;
             }
-            items.forEach(item =>{
+
+            list.forEach(item => {
                 const div = document.createElement("div");
-                div.textContent=item.getSummary();
-                out.appendChild(div)
+                div.textContent = item.getSummary();
+                out.appendChild(div);
             });
         }
-        function loadFile(){}
-        function download(){}
-        //Expose functions to HTML buttons
-        window.startPage=startPage;
-        window.addItem=addItem;
-        window.showItems=showItems;
-        window.loadFile=loadFile;
-        window.download=download;
-        window.updateForm=updateForm;
+
+        function searchItems() {
+            const query = document.getElementById("search").value;
+            const results = library.search(query);
+            showItems(results);
+        }
+
+        function loadFile() {
+            const input = document.getElementById("fileInput");
+            const file = input.files[0];
+
+            if (!file) {
+                alert("Please select a TXT file first.");
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function () {
+                try {
+                    const text = reader.result;
+                    const errors = library.loadFromText(text);
+                    showItems();
+
+                    if (errors.length > 0) {
+                        alert("File loaded with some errors:\n" + errors.join("\n"));
+                    } else {
+                        alert("File loaded successfully.");
+                    }
+                } catch (e) {
+                    alert("Error loading file: " + e.message);
+                }
+            };
+
+            reader.onerror = function () {
+                alert("Could not read the file.");
+            };
+
+            reader.readAsText(file);
+        }
+
+        function download() {
+            try {
+                const text = library.toText();
+                const blob = new Blob([text], { type: "text/plain" });
+                const link = document.createElement("a");
+
+                link.href = URL.createObjectURL(blob);
+                link.download = "library.txt";
+                link.click();
+
+                URL.revokeObjectURL(link.href);
+            } catch (e) {
+                alert("Error downloading file: " + e.message);
+            }
+        }
+
+        function clearForm() {
+            document.getElementById("id").value = "";
+            document.getElementById("title").value = "";
+            document.getElementById("author").value = "";
+            document.getElementById("director").value = "";
+            document.getElementById("year").value = "";
+            document.getElementById("pages").value = "";
+            document.getElementById("genre").value = "";
+            document.getElementById("duration").value = "";
+        }
+
+        window.startPage = startPage;
+        window.updateForm = updateForm;
+        window.addItem = addItem;
+        window.showItems = showItems;
+        window.searchItems = searchItems;
+        window.loadFile = loadFile;
+        window.download = download;
     </script>
-    <script src="Library.js"></script>
 </head>
 <body onload="startPage()">
     <h1>Library system</h1>
     <hr>
-    <h3>Upload files</h3>
-    <input type="file" id="fileInput">
-    <button onclick="loadFile()">load</button>
+
+    <h3>Upload TXT file</h3>
+    <input type="file" id="fileInput" accept=".txt">
+    <button onclick="loadFile()">Load</button>
+
     <hr>
+
     <h3>Add Item</h3>
     <label>Type:</label>
     <select id="type" onchange="updateForm()">
@@ -85,18 +166,19 @@
     </select>
 
     <br><br>
+
     <input id="id" placeholder="ID">
     <input id="title" placeholder="Title">
-    <input id="author" placeholder="Author">
-    <input id="year" placeholder="Year">
+    <input id="year" type="number" placeholder="Year">
 
-    <!--book-->
     <span id="book-fields">
+        <input id="author" placeholder="Author">
         <input id="pages" type="number" placeholder="Pages">
-        <input id="ISBN" placeholder="ISBN">
+        <input id="genre" placeholder="Genre">
     </span>
-    <!--DVD-->
-    <span id="dvd-fields" style="display: none">
+
+    <span id="dvd-fields" style="display: none;">
+        <input id="director" placeholder="Director">
         <input id="duration" type="number" placeholder="Duration">
     </span>
 
@@ -104,13 +186,20 @@
     <button onclick="addItem()">Add Item</button>
 
     <hr>
-    <h3>Items</h3>
-    <button onclick="showItems()">Refresh</button>
-    <div id="output" style="font-family:monospace"></div>
+
+    <h3>Search</h3>
+    <input id="search" placeholder="Search items">
+    <button onclick="searchItems()">Search</button>
+    <button onclick="showItems()">Show All</button>
 
     <hr>
-    <h3>Download</h3>
-    <button onclick="download()">Download</button>
 
+    <h3>Items</h3>
+    <div id="output" style="font-family: monospace; white-space: pre-line;"></div>
+
+    <hr>
+
+    <h3>Download</h3>
+    <button onclick="download()">Download TXT</button>
 </body>
 </html>

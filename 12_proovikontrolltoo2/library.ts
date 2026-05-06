@@ -5,9 +5,13 @@ class LibraryItem {
     year: number;
 
     constructor(id: string, title: string, author: string, year: number) {
-        //Removes the whitespaces from both ends of the string
-        //=== checking whether this is empty after removing spaces
-        if (id.trim() === "") throw new Error("ID cannot be emprty");
+        if (id.trim() === "") throw new Error("ID cannot be empty");
+        if (title.trim() === "") throw new Error("Title cannot be empty");
+        if (author.trim() === "") throw new Error("Author or director cannot be empty");
+        if (!Number.isInteger(year) || year < 1000 || year > 3000) {
+            throw new Error("Year must be between 1000 and 3000");
+        }
+
         this.id = id;
         this.title = title;
         this.author = author;
@@ -18,117 +22,146 @@ class LibraryItem {
     getTitle(): string { return this.title; }
     getAuthor(): string { return this.author; }
     getYear(): number { return this.year; }
-    getSummary(): string { return `[Item] ${this.title}`; }
 
+    getSummary(): string {
+        return `[Item] ${this.title}`;
+    }
 }
 
-//-------------------------------Book------------------------------------
 class Book extends LibraryItem {
     pages: number;
-    ISBN: string;
+    genre: string;
 
-    constructor(id: string, title: string, author: string, year: number, pages: number, ISBN: string
-    ) {
+    constructor(id: string, title: string, author: string, year: number, pages: number, genre: string) {
         super(id, title, author, year);
-        if (pages <= 0) throw new Error("Pages must be positive");
+
+        if (!Number.isInteger(pages) || pages <= 0) {
+            throw new Error("Pages must be a positive number");
+        }
+
+        if (genre.trim() === "") {
+            throw new Error("Genre cannot be empty");
+        }
+
         this.pages = pages;
-        this.ISBN = ISBN;
+        this.genre = genre;
     }
 
     getSummary(): string {
-        return `[Book] ${this.title} (${this.year})`;
+        return `[Book] ${this.id} | ${this.title} | ${this.author} | ${this.year} | ${this.pages} pages | ${this.genre}`;
     }
-    //This method convert the Book object into a text line (for saving)
-    //Here each property is seperated by | so we can read it easily later
-    toFillLine(): string {
-        return `[Book]|${this.id}|${this.title}|${this.author}|(${this.year})|${this.pages}|${this.ISBN}`;
+
+    toFileLine(): string {
+        return `BOOK|${this.id}|${this.title}|${this.author}|${this.year}|${this.pages}|${this.genre}`;
     }
 }
 
-//----------------------------DVD---------------------------------------------
 class DVD extends LibraryItem {
     duration: number;
+
     constructor(id: string, title: string, director: string, year: number, duration: number) {
         super(id, title, director, year);
-        if (duration <= 0) throw new Error("Duration must be positive");
+
+        if (!Number.isInteger(duration) || duration <= 0) {
+            throw new Error("Duration must be a positive number");
+        }
+
         this.duration = duration;
     }
 
     getSummary(): string {
-        return `[DVD] ${this.title} (${this.year})`;
+        return `[DVD] ${this.id} | ${this.title} | ${this.author} | ${this.year} | ${this.duration} min`;
     }
 
-    toFillLine(): string {
-        return `[DVD]|${this.id}|${this.title}|${this.author}|(${this.year})|${this.duration}`;
+    toFileLine(): string {
+        return `DVD|${this.id}|${this.title}|${this.author}|${this.year}|${this.duration}`;
     }
 }
 
-//---------------------------------Library-------------------
-//Manage all the items
 class Library {
     items: LibraryItem[];
 
-    constructor() { this.items = [] } //starts with a empty list
+    constructor() {
+        this.items = [];
+    }
 
-    //add a new item to the library
     addItem(item: LibraryItem): void {
+        if (this.items.some(existing => existing.getId() === item.getId())) {
+            throw new Error(`Item with ID ${item.getId()} already exists`);
+        }
+
         this.items.push(item);
     }
 
     getAll(): LibraryItem[] {
-        return this.items;
+        return [...this.items];
+    }
+
+    search(query: string): LibraryItem[] {
+        const q = query.trim().toLowerCase();
+
+        if (q === "") {
+            return this.getAll();
+        }
+
+        return this.items.filter(item =>
+            item.getSummary().toLowerCase().includes(q)
+        );
     }
 
     toText(): string {
-        //map is an array method, it takes each item and transform it
-        //i: each item in the array
-        //i.toFillLine converts object-string
-        return this.items.map((i: any) => i.toFillLine()).join("\n")
-        //\n mean new line
-        // join("\n") : mean join everything with line breaks
+        return this.items.map((item: any) => item.toFileLine()).join("\n");
     }
 
-    //Covert text to objects, because we need to read item details from text files
     loadFromText(text: string): string[] {
-        const lines = text.split("\n");
+        const lines = text.split(/\r?\n/);
         const errors: string[] = [];
-        for (let line of lines) {
+
+        for (const rawLine of lines) {
+            const line = rawLine.trim();
+
+            if (line === "") continue;
+
             try {
                 const parts = line.split("|");
+
                 if (parts[0] === "BOOK") {
-                    this.addItem(new Book(
-                        parts[1], parts[2], parts[3],
-                        Number(parts[4]), Number(parts[5]), parts[6]
-                    ));
+                    if (parts.length !== 7) {
+                        throw new Error("Invalid BOOK format");
+                    }
+
+                    const book = new Book(
+                        parts[1],
+                        parts[2],
+                        parts[3],
+                        Number(parts[4]),
+                        Number(parts[5]),
+                        parts[6]
+                    );
+
+                    this.addItem(book);
                 } else if (parts[0] === "DVD") {
-                    this.addItem(new DVD(
-                        parts[1], parts[2], parts[3], Number(parts[4]), Number(parts[5])
-                    ));
+                    if (parts.length !== 6) {
+                        throw new Error("Invalid DVD format");
+                    }
+
+                    const dvd = new DVD(
+                        parts[1],
+                        parts[2],
+                        parts[3],
+                        Number(parts[4]),
+                        Number(parts[5])
+                    );
+
+                    this.addItem(dvd);
+                } else {
+                    throw new Error("Unknown item type");
                 }
             } catch (e) {
-                errors.push("Error" + line);
+                errors.push(`Error in line: ${line}`);
             }
         }
+
         return errors;
     }
 }
-
-export {
-    LibraryItem,
-    Book,
-    DVD,
-    Library
-}
-
-const item1 = new LibraryItem("1", "Generic item", "unknown", 2020);
-console.log(item1)
-const book1 = new Book("2B", "Harry Potter", "J.K rowling", 1990, 300, "334445");
-const book2 = new Book("3B", "The hobbit", "J.R.R Tolkien", 1937, 300, "554445");
-console.log(book1)
-console.log(item1.getSummary())
-console.log(book1.getSummary())
-console.log(book1.toFillLine())
-const lib = new Library();
-lib.addItem(book1);
-lib.addItem(book2);
-console.log(lib.toText())

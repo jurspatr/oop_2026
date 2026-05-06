@@ -1,6 +1,8 @@
-export type ItemType = "book" | "dvd";
+// catalogue.ts
 
-export type ItemRecord =
+type ItemType = "book" | "dvd";
+
+type ItemRecord =
   | {
       type: "book";
       id: number;
@@ -19,7 +21,7 @@ export type ItemRecord =
       duration: number;
     };
 
-export abstract class LibraryItem {
+abstract class LibraryItem {
   constructor(
     protected readonly id: number,
     protected readonly title: string,
@@ -44,7 +46,7 @@ export abstract class LibraryItem {
   abstract toRecord(): ItemRecord;
 }
 
-export class Book extends LibraryItem {
+class Book extends LibraryItem {
   constructor(
     id: number,
     title: string,
@@ -61,13 +63,18 @@ export class Book extends LibraryItem {
   }
 
   getSummary(): string {
-    return `Book #${this.id}: "${this.title}" (${this.year}) (${this.ISBN}) by ${this.author}, ${this.pages} pages.`;
+    return `Book #${this.id}: "${this.title}" (${this.year}), ISBN ${this.ISBN}, by ${this.author}, ${this.pages} pages.`;
   }
 
   matches(query: string): boolean {
     const q = query.toLowerCase();
-    return [this.title, this.author, String(this.year), this.getTypeLabel()]
-      .some(value => value.toLowerCase().includes(q));
+    return [
+      this.title,
+      this.author,
+      String(this.year),
+      String(this.ISBN),
+      this.getTypeLabel()
+    ].some(value => value.toLowerCase().includes(q));
   }
 
   toRecord(): ItemRecord {
@@ -83,7 +90,7 @@ export class Book extends LibraryItem {
   }
 }
 
-export class DVD extends LibraryItem {
+class DVD extends LibraryItem {
   constructor(
     id: number,
     title: string,
@@ -104,8 +111,12 @@ export class DVD extends LibraryItem {
 
   matches(query: string): boolean {
     const q = query.toLowerCase();
-    return [this.title, this.director, String(this.year), this.getTypeLabel()]
-      .some(value => value.toLowerCase().includes(q));
+    return [
+      this.title,
+      this.director,
+      String(this.year),
+      this.getTypeLabel()
+    ].some(value => value.toLowerCase().includes(q));
   }
 
   toRecord(): ItemRecord {
@@ -120,16 +131,19 @@ export class DVD extends LibraryItem {
   }
 }
 
-export class CatalogueValidationError extends Error {}
+class CatalogueValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "CatalogueValidationError";
+  }
+}
 
-export class LibraryCatalogue {
+class LibraryCatalogue {
   private items: LibraryItem[] = [];
 
   addItem(item: LibraryItem): void {
     if (this.items.some(existing => existing.getId() === item.getId())) {
-      throw new CatalogueValidationError(
-        `An item with ID ${item.getId()} already exists.`
-      );
+      throw new CatalogueValidationError(`An item with ID ${item.getId()} already exists.`);
     }
     this.items.push(item);
   }
@@ -161,18 +175,12 @@ export class LibraryCatalogue {
 
     try {
       parsed = JSON.parse(json);
-    } catch {
+    } catch (e) {
       throw new CatalogueValidationError("The selected file is not valid JSON.");
     }
 
-    if (
-      !parsed ||
-      typeof parsed !== "object" ||
-      !Array.isArray((parsed as { items?: unknown }).items)
-    ) {
-      throw new CatalogueValidationError(
-        "The file must contain an object with an items array."
-      );
+    if (!parsed || typeof parsed !== "object" || !Array.isArray((parsed as { items?: unknown }).items)) {
+      throw new CatalogueValidationError("The file must contain an object with an items array.");
     }
 
     const incoming = (parsed as { items: unknown[] }).items;
@@ -185,12 +193,10 @@ export class LibraryCatalogue {
         const item = LibraryCatalogue.itemFromUnknown(entry);
         this.addItem(item);
         added += 1;
-      } catch (error) {
+      } catch (e) {
         rejected += 1;
         errors.push(
-          `Item ${index + 1}: ${
-            error instanceof Error ? error.message : "Invalid entry."
-          }`
+          `Item ${index + 1}: ${e instanceof Error ? e.message : "Invalid entry."}`
         );
       }
     });
@@ -215,25 +221,27 @@ export class LibraryCatalogue {
     }
 
     if (!Number.isInteger(year) || (year as number) < 1000 || (year as number) > 3000) {
-      throw new CatalogueValidationError(
-        "Year must be a valid integer between 1000 and 3000."
-      );
+      throw new CatalogueValidationError("Year must be a valid integer between 1000 and 3000.");
     }
 
     if (type === "book") {
       if (typeof raw.author !== "string" || raw.author.trim().length === 0) {
         throw new CatalogueValidationError("Book author is required.");
       }
+
+      if (!Number.isInteger(raw.ISBN) || (raw.ISBN as number) <= 0) {
+        throw new CatalogueValidationError("Book ISBN must be a positive integer.");
+      }
+
       if (!Number.isInteger(raw.pages) || (raw.pages as number) <= 0) {
-        throw new CatalogueValidationError(
-          "Book pages must be a positive integer."
-        );
+        throw new CatalogueValidationError("Book pages must be a positive integer.");
       }
 
       return new Book(
         id as number,
         title.trim(),
         year as number,
+        raw.ISBN as number,
         raw.author.trim(),
         raw.pages as number
       );
@@ -243,10 +251,9 @@ export class LibraryCatalogue {
       if (typeof raw.director !== "string" || raw.director.trim().length === 0) {
         throw new CatalogueValidationError("DVD director is required.");
       }
+
       if (!Number.isInteger(raw.duration) || (raw.duration as number) <= 0) {
-        throw new CatalogueValidationError(
-          "DVD duration must be a positive integer."
-        );
+        throw new CatalogueValidationError("DVD duration must be a positive integer.");
       }
 
       return new DVD(
