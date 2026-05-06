@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop Selector</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 20px;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1, h2 {
+      color: #0f172a;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    label, input, button, select {
+      font-size: 16px;
+    }
+
+    input, button {
+      padding: 10px 12px;
+      margin: 6px 0;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    .shop-item {
+      margin-bottom: 8px;
+    }
+
+    .stats {
+      background: #eff6ff;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .open {
+      color: green;
+      font-weight: bold;
+    }
+
+    .closed {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Shop Selector</h1>
+
+    <div class="card">
+      <h2>Check open shops</h2>
+      <label for="timeInput">Enter time (00.00-23.59):</label><br />
+      <input type="number" id="timeInput" min="0" max="23" value="10" />
+      <button onclick="showOpenShops()">Show Open Shops</button>
+      <div id="openShopsOutput"></div>
+    </div>
+
+    <div class="card">
+      <h2>Visit a shop</h2>
+      <label for="visitShopName">Enter shop name:</label><br />
+      <input type="text" id="visitShopName" placeholder="e.g. Prisma Sikupilli" />
+      <button onclick="visitShopByName()">Visit Shop</button>
+      <div id="visitOutput"></div>
+    </div>
+
+    <div class="card">
+      <h2>All statistics</h2>
+      <button onclick="showStatistics()">Display Statistics</button>
+      <div id="statsOutput"></div>
+    </div>
+  </div>
+
+  <script src="store.js"></script>
+</body>
+</html>
