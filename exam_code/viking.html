@@ -55,11 +55,30 @@
       margin-top: 20px;
       font-weight: bold;
     }
+
+    #nextBtn {
+      margin-top: 15px;
+      display: none;
+      background: #b68b4c;
+      color: white;
+      border: none;
+    }
+
+    #nextBtn:hover {
+      background: #9b763f;
+    }
+
+    #inventory {
+      margin-top: 15px;
+      color: #7a5321;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
   <div class="box">
     <h1>Viking Quiz</h1>
+
     <p id="question">Which alphabet did the Vikings use?</p>
 
     <div id="answers" class="answers"></div>
@@ -72,6 +91,8 @@
       <button id="spearBtn">Spear</button>
       <button id="goldBtn">Gold</button>
     </div>
+
+    <button id="nextBtn">Next question</button>
 
     <p id="inventory"></p>
     <p id="message">Choose an answer.</p>

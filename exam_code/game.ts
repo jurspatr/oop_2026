@@ -1,160 +1,333 @@
-abstract class Item {
-  abstract use(game: VikingQuizGame, index?: number): string; 
+interface Question {
+  question: string;
+  answers: string[];
+  correct: number;
 }
-class Shield extends Item { 
-  use(game: VikingQuizGame): string { 
-    game.shieldOn = true; 
-    return "Shield is active."; 
+
+abstract class Item {
+  used = false;
+  abstract readonly key: string;
+  abstract use(game: VikingQuizGame, index?: number): string;
+}
+
+class Shield extends Item {
+  readonly key = "shield";
+
+  use(game: VikingQuizGame): string {
+    if (this.used) return "Shield has already been used.";
+    this.used = true;
+    game.shieldOn = true;
+    return "Shield is active. You get one extra try!";
   }
 }
 
-class Sword extends Item { 
+class Sword extends Item {
+  readonly key = "sword";
+
   use(game: VikingQuizGame): string {
+    if (this.used) return "Sword has already been used.";
+    this.used = true;
     return game.removeWrongAnswers(2);
   }
 }
 
-class Spear extends Item { 
-  use(game: VikingQuizGame): string { 
+class Spear extends Item {
+  readonly key = "spear";
+
+  use(game: VikingQuizGame): string {
+    if (this.used) return "Spear has already been used.";
+    this.used = true;
     return game.removeWrongAnswers(1);
   }
 }
 
-class Gold extends Item { 
+class Gold extends Item {
+  readonly key = "gold";
+
   use(game: VikingQuizGame): string {
-    return "Correct answer: " + game.answers[game.correct]; 
+    if (this.used) return "Gold has already been used.";
+    this.used = true;
+    return "Correct answer: " + game.currentQuestion.answers[game.currentQuestion.correct];
   }
 }
 
-class Knife extends Item { 
-  use(game: VikingQuizGame, index?: number): string { 
-    if (index === undefined) { 
-      game.knifeMode = true; 
-      return "Click an answer to remove."; 
+class Knife extends Item {
+  readonly key = "knife";
+
+  use(game: VikingQuizGame, index?: number): string {
+    if (this.used && index === undefined) {
+      return "Knife has already been used.";
     }
 
-    if (index === game.correct) { 
+    if (index === undefined) {
+      game.knifeMode = true;
+      return "Click an answer to remove it.";
+    }
+
+    if (index === game.currentQuestion.correct) {
       game.knifeMode = false;
-      return "That one is correct, so you cannot remove it.";
+      return "That answer is correct, so you cannot remove it.";
     }
 
-    game.removed.add(index); // Lisab valitud vale vastuse eemaldatud vastuste hulka.
-    game.knifeMode = false; 
-    return "Removed answer."; 
+    game.removed.add(index);
+    game.knifeMode = false;
+    this.used = true;
+    return "Removed answer.";
   }
 }
 
-class VikingQuizGame { 
-  question = "Which alphabet did the Vikings use?";
-  answers = [ // Vastuste massiiv.
-    "Latin alphabet", // Esimene vastusevariant.
-    "Greek alphabet", // Teine vastusevariant.
-    "Runes / Younger Futhark", // Kolmas vastusevariant, mis on õige.
-    "Cyrillic alphabet" // Neljas vastusevariant.
-  ];
-  correct = 2; 
+class VikingQuizGame {
+  questions: Question[];
+  currentQuestionIndex = 0;
 
-  removed = new Set<number>(); // Set hoiab alles eemaldatud vastuste indeksid.
-  shieldOn = false; 
-  knifeMode = false; 
+  removed = new Set<number>();
+  shieldOn = false;
+  knifeMode = false;
   shieldUsedWrong = false;
+  answeredCorrectly = false;
 
-  shield = new Shield(); // Loob Shield objekti
-  sword = new Sword(); // Loob Sword objekti.
-  knife = new Knife(); // Loob Knife objekti.
-  spear = new Spear(); // Loob Spear objekti.
-  gold = new Gold(); // Loob Gold objekti.
+  shield = new Shield();
+  sword = new Sword();
+  knife = new Knife();
+  spear = new Spear();
+  gold = new Gold();
 
-  answer(index: number): string { // kontrollin kasutaja valitud vastust.
-    if (this.removed.has(index)) { // Kontrollin, kas see vastus on juba eemaldatud.
+  constructor(questions: Question[]) {
+    this.questions = questions;
+  }
+
+  get currentQuestion(): Question {
+    return this.questions[this.currentQuestionIndex];
+  }
+
+  answer(index: number): string {
+    if (this.removed.has(index)) {
       return "That answer is removed.";
     }
 
-    if (index === this.correct) { 
-      return "Correct! Vikings used runes."; 
+    if (index === this.currentQuestion.correct) {
+      this.answeredCorrectly = true;
+      return "Correct!";
     }
 
-    if (this.shieldOn && !this.shieldUsedWrong) { // Kontrollin, kas kilp on peal ja lisakatset pole veel kasutatud.
-      this.shieldUsedWrong = true; 
-      this.shieldOn = false; 
-      return "Wrong, but shield gives you one extra try."; 
+    if (this.shieldOn && !this.shieldUsedWrong) {
+      this.shieldUsedWrong = true;
+      this.shieldOn = false;
+      return "Wrong, but shield gives you one extra try!";
     }
 
-    return "Wrong answer."; 
+    return "Wrong answer.";
   }
 
-  removeWrongAnswers(amount: number): string { // Meetod, mis eemaldab etteantud arvu valesid vastuseid.
-    let wrong: number[] = []; // Loon tühja massiivi valede vastuste indeksite hoidmiseks.
+  removeWrongAnswers(amount: number): string {
+    let wrong: number[] = [];
 
-    for (let i = 0; i < this.answers.length; i++) {
-      if (i !== this.correct && !this.removed.has(i)) { // Kontrollin, et vastus poleks õige ega juba eemaldatud.
-        wrong.push(i); // Meetod lisab selle vale vastuse indeksi wrong massiivi.
+    for (let i = 0; i < this.currentQuestion.answers.length; i++) {
+      if (i !== this.currentQuestion.correct && !this.removed.has(i)) {
+        wrong.push(i);
       }
     }
 
-    wrong = wrong.sort(() => Math.random() - 0.5); // Segan valede vastuste järjekorra juhuslikuks.
+    wrong = wrong.sort(() => Math.random() - 0.5);
 
-    for (let i = 0; i < amount && i < wrong.length; i++) { // Käib läbi nii palju valesid vastuseid, kui vaja eemaldada või kui saadaval on.
-      this.removed.add(wrong[i]); // Lisab iga valitud vale vastuse eemaldatud vastuste hulka.
+    for (let i = 0; i < amount && i < wrong.length; i++) {
+      this.removed.add(wrong[i]);
     }
 
-    return "Removed wrong answer(s)."; 
+    return "Removed wrong answer(s).";
+  }
+
+  nextQuestion(): boolean {
+    if (!this.answeredCorrectly) {
+      return false;
+    }
+
+    if (this.currentQuestionIndex < this.questions.length - 1) {
+      this.currentQuestionIndex++;
+      this.removed.clear();
+      this.shieldOn = false;
+      this.knifeMode = false;
+      this.shieldUsedWrong = false;
+      this.answeredCorrectly = false;
+      return true;
+    }
+
+    return false;
   }
 }
 
-const game = new VikingQuizGame(); // Loon mängu objekti.
+const questions: Question[] = [
+  {
+    question: "Which alphabet did the Vikings use?",
+    answers: [
+      "Latin alphabet",
+      "Greek alphabet",
+      "Runes / Younger Futhark",
+      "Cyrillic alphabet"
+    ],
+    correct: 2
+  },
+  {
+    question: "What was the name of Thor's hammer?",
+    answers: [
+      "Gungnir",
+      "Mjolnir",
+      "Excalibur",
+      "Draupnir"
+    ],
+    correct: 1
+  }
+];
 
-const answersDiv = document.getElementById("answers") as HTMLDivElement; // Otsin HTML-ist elementi id-ga "answers" 
-const message = document.getElementById("message") as HTMLParagraphElement; // Otsin HTML-ist elementi id-ga "message" 
-const question = document.getElementById("question") as HTMLParagraphElement; // Otsin HTML-ist küsimuse elementi.
+const game = new VikingQuizGame(questions);
 
-question.textContent = game.question; // Paneb küsimuse teksti HTML elementi nähtavale.
+const questionEl = document.getElementById("question") as HTMLParagraphElement;
+const answersDiv = document.getElementById("answers") as HTMLDivElement;
+const messageEl = document.getElementById("message") as HTMLParagraphElement;
+const inventoryEl = document.getElementById("inventory") as HTMLParagraphElement;
 
-function showAnswers(): void { 
-  answersDiv.innerHTML = ""; 
+const shieldBtn = document.getElementById("shieldBtn") as HTMLButtonElement;
+const swordBtn = document.getElementById("swordBtn") as HTMLButtonElement;
+const knifeBtn = document.getElementById("knifeBtn") as HTMLButtonElement;
+const spearBtn = document.getElementById("spearBtn") as HTMLButtonElement;
+const goldBtn = document.getElementById("goldBtn") as HTMLButtonElement;
+const nextBtn = document.getElementById("nextBtn") as HTMLButtonElement;
 
-  for (let i = 0; i < game.answers.length; i++) { 
+function updateQuestion(): void {
+  questionEl.textContent = game.currentQuestion.question;
+}
+
+function updateInventory(): void {
+  const available: string[] = [];
+
+  if (!game.shield.used) available.push("Shield");
+  if (!game.sword.used) available.push("Sword");
+  if (!game.knife.used) available.push("Knife");
+  if (!game.spear.used) available.push("Spear");
+  if (!game.gold.used) available.push("Gold");
+
+}
+
+function updateItemButtons(): void {
+  shieldBtn.disabled = game.shield.used;
+  swordBtn.disabled = game.sword.used;
+  knifeBtn.disabled = game.knife.used;
+  spearBtn.disabled = game.spear.used;
+  goldBtn.disabled = game.gold.used;
+}
+
+function showAnswers(): void {
+  answersDiv.innerHTML = "";
+
+  for (let i = 0; i < game.currentQuestion.answers.length; i++) {
     const btn = document.createElement("button");
-    btn.textContent = game.answers[i]; // Panen nupu tekstiks vastuse sisu.
+    btn.textContent = game.currentQuestion.answers[i];
 
-    if (game.removed.has(i)) { // Kontrollin, kas  vastus on eemaldatud
-      btn.disabled = true; 
+    if (game.removed.has(i)) {
+      btn.disabled = true;
       btn.classList.add("removed");
     }
 
-    btn.addEventListener("click", () => { // Lisan nupule kliki ja kontrollin noa režiimi
+    if (game.answeredCorrectly) {
+      btn.disabled = true;
+    }
+
+    btn.addEventListener("click", () => {
       if (game.knifeMode) {
-        message.textContent = game.knife.use(game, i); 
+        messageEl.textContent = game.knife.use(game, i);
       } else {
-        message.textContent = game.answer(i); 
+        const result = game.answer(i);
+
+        if (result === "Correct!") {
+          if (game.currentQuestionIndex === 0) {
+            messageEl.textContent = "Correct! Vikings used runes.";
+          } else if (game.currentQuestionIndex === 1) {
+            messageEl.textContent = "Correct! Thor's hammer was Mjolnir.";
+          } else {
+            messageEl.textContent = "Correct!";
+          }
+
+          nextBtn.style.display = "inline-block";
+        } else {
+          messageEl.textContent = result;
+        }
       }
-      showAnswers(); 
+
+      updateItemButtons();
+      updateInventory();
+      showAnswers();
     });
 
-    answersDiv.appendChild(btn); 
+    answersDiv.appendChild(btn);
   }
 }
 
-document.getElementById("shieldBtn")!.addEventListener("click", () => { 
-  message.textContent = game.shield.use(game); 
+function goToNextQuestion(): void {
+  if (!game.answeredCorrectly) {
+    messageEl.textContent = "You can move on only after choosing the correct answer.";
+    return;
+  }
+  const hasNext = game.nextQuestion();
+  
+  if (hasNext) {
+    updateQuestion();
+    showAnswers();
+    updateItemButtons();
+    updateInventory();
+    messageEl.textContent = "Next question!";
+    nextBtn.style.display = "none";
+  } else {
+    questionEl.textContent = "You finished the quiz!";
+    answersDiv.innerHTML = "";
+    messageEl.textContent = "Well done, brave Viking!";
+    nextBtn.style.display = "none";
+  }
+}
+
+
+shieldBtn.addEventListener("click", () => {
+  if (game.answeredCorrectly) return;
+  messageEl.textContent = game.shield.use(game);
+  updateItemButtons();
+  updateInventory();
 });
 
-document.getElementById("swordBtn")!.addEventListener("click", () => {
-  message.textContent = game.sword.use(game); 
-  showAnswers(); // uuendan vastuste kuvamist sest mõned vastused kadudsid
+swordBtn.addEventListener("click", () => {
+  if (game.answeredCorrectly) return;
+  messageEl.textContent = game.sword.use(game);
+  updateItemButtons();
+  updateInventory();
+  showAnswers();
 });
 
-document.getElementById("knifeBtn")!.addEventListener("click", () => { 
-  message.textContent = game.knife.use(game); 
+knifeBtn.addEventListener("click", () => {
+  if (game.answeredCorrectly) return;
+  messageEl.textContent = game.knife.use(game);
+  updateItemButtons();
+  updateInventory();
 });
 
-document.getElementById("spearBtn")!.addEventListener("click", () => { 
-  message.textContent = game.spear.use(game); 
-  showAnswers(); 
+spearBtn.addEventListener("click", () => {
+  if (game.answeredCorrectly) return;
+  messageEl.textContent = game.spear.use(game);
+  updateItemButtons();
+  updateInventory();
+  showAnswers();
 });
 
-document.getElementById("goldBtn")!.addEventListener("click", () => { 
-  message.textContent = game.gold.use(game); 
+goldBtn.addEventListener("click", () => {
+  if (game.answeredCorrectly) return;
+  messageEl.textContent = game.gold.use(game);
+  updateItemButtons();
+  updateInventory();
 });
 
+nextBtn.addEventListener("click", () => {
+  goToNextQuestion();
+});
+
+updateQuestion();
 showAnswers();
+updateItemButtons();
+updateInventory();
+nextBtn.style.display = "none";
