@@ -13,8 +13,8 @@ if (modeText) {
     modeText.textContent = mode === "school" ? "School Mode" : "Singleplayer";
 }
 beginJourneyBtn === null || beginJourneyBtn === void 0 ? void 0 : beginJourneyBtn.addEventListener("click", function () {
-    window.location.href = "game.html";
+    window.location.href = "level.html";
 });
 backToMenuBtn === null || backToMenuBtn === void 0 ? void 0 : backToMenuBtn.addEventListener("click", function () {
-    window.location.href = "index.html";
+    window.location.href = "start.html";
 });
