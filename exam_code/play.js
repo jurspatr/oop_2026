@@ -33,6 +33,7 @@ function updateStartButtonState() {
         ? hasName && hasPassword
         : hasName && hasRoomCode;
     startAdventureBtn.classList.toggle("enabled", isValid);
+    startAdventureBtn.disabled = !isValid;
 }
 playBtn === null || playBtn === void 0 ? void 0 : playBtn.addEventListener("click", function () {
     playDialog === null || playDialog === void 0 ? void 0 : playDialog.showModal();
@@ -51,30 +52,24 @@ vikingName === null || vikingName === void 0 ? void 0 : vikingName.addEventListe
 password === null || password === void 0 ? void 0 : password.addEventListener("input", updateStartButtonState);
 roomCode === null || roomCode === void 0 ? void 0 : roomCode.addEventListener("input", updateStartButtonState);
 playForm === null || playForm === void 0 ? void 0 : playForm.addEventListener("submit", function (event) {
+    var _a, _b, _c;
     event.preventDefault();
-    var hasName = vikingName ? vikingName.value.trim().length > 0 : false;
-    var hasPassword = password ? password.value.trim().length > 0 : false;
-    var hasRoomCode = roomCode ? roomCode.value.trim().length > 0 : false;
+    var name = (_a = vikingName === null || vikingName === void 0 ? void 0 : vikingName.value.trim()) !== null && _a !== void 0 ? _a : "";
+    var enteredPassword = (_b = password === null || password === void 0 ? void 0 : password.value.trim()) !== null && _b !== void 0 ? _b : "";
+    var enteredRoomCode = (_c = roomCode === null || roomCode === void 0 ? void 0 : roomCode.value.trim()) !== null && _c !== void 0 ? _c : "";
     var valid = currentMode === "singleplayer"
-        ? hasName && hasPassword
-        : hasName && hasRoomCode;
+        ? name.length > 0 && enteredPassword.length > 0
+        : name.length > 0 && enteredRoomCode.length > 0;
     if (!valid)
         return;
-    if (currentMode === "singleplayer") {
-        alert("Starting singleplayer adventure...");
-    }
-    else {
-        alert("Joining school mode adventure...");
-    }
-    playDialog === null || playDialog === void 0 ? void 0 : playDialog.close();
+    var params = new URLSearchParams({
+        name: name,
+        mode: currentMode
+    });
+    window.location.href = "intro.html?".concat(params.toString());
 });
 playDialog === null || playDialog === void 0 ? void 0 : playDialog.addEventListener("click", function (event) {
-    var rect = playDialog.getBoundingClientRect();
-    var clickedInside = event.clientX >= rect.left &&
-        event.clientX <= rect.right &&
-        event.clientY >= rect.top &&
-        event.clientY <= rect.bottom;
-    if (!clickedInside) {
+    if (event.target === playDialog) {
         playDialog.close();
     }
 });

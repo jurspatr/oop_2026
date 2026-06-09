@@ -3,68 +3,66 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Viking Quest</title>
+  <title>Viking quest</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Uncial+Antiqua&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!--Menu-->
+
   <section class="menu-panel">
-    <div class="title-icon">⛵</div>
-    <h1>Viking Quest</h1>
+    <h1>Viikingitemäng</h1>
     <div class="title-line"></div>
-    <p class="subtitle">Journey Through Myth and History</p>
+    <p class="subtitle">Avasta ja uuri viikingite kohta</p>
 
     <div class="menu-buttons">
-      <button id="playBtn" class="menu-btn play">▶ Play</button>
-      <button id="guideBtn" class="menu-btn guide">☷ Guide</button>
-      <button id="settingsBtn" class="menu-btn settings">⚙ Settings</button>
+      <button id="playBtn" class="menu-btn play">▶ Mängi</button>
+      <button id="guideBtn" class="menu-btn guide">☷ Juhend</button>
+      <button id="settingsBtn" class="menu-btn settings">⚙ Sätted</button>
     </div>
 
-    <p class="footer-text">Educational Viking History Game</p>
   </section>
 
+  <!--Settings-->
   <dialog id="settingsDialog" class="settings-dialog">
     <div class="settings-header">
-      <h2>Settings</h2>
+      <h2>Sätted</h2>
       <button id="closeSettingsBtn" class="close-btn" aria-label="Close settings">✕</button>
     </div>
 
     <div class="settings-content">
-      <p>Add your game settings here later.</p>
+      <p>Lisa sätted hiljem</p>
 
       <div class="setting-row">
-        <span>Music</span>
+        <span>Muusika</span>
         <span>Coming soon</span>
       </div>
 
       <div class="setting-row">
-        <span>Difficulty</span>
+        <span>Raskustase</span>
         <span>Coming soon</span>
       </div>
 
       <div class="setting-row">
-        <span>Language</span>
+        <span>Keel</span>
         <span>Coming soon</span>
       </div>
     </div>
   </dialog>
 
+  <!--Guide-->
   <dialog id="guideDialog" class="guide-dialog">
     <button id="closeGuideBtn" class="guide-close-btn" aria-label="Close guide">✕</button>
 
     <div class="guide-top-icon">?</div>
 
-    <h2 class="guide-title">How to Play</h2>
-    <p class="guide-subtitle">Welcome, Viking Warrior!</p>
+    <h2 class="guide-title">Mängu juhised</h2>
 
     <div class="guide-card">
       <div class="guide-icon movement-icon">✥</div>
       <div class="guide-text">
-        <h3>Movement</h3>
-        <p>Use arrow keys or WASD to move your Viking</p>
+        <h3>Liikumine</h3>
+        <p>Kasuta nooli või WASD, tegelase liigutamiseks</p>
         <div class="key-row">
           <span class="key-box">W</span>
           <span class="key-box">A</span>
@@ -77,52 +75,50 @@
     <div class="guide-card">
       <div class="guide-icon question-icon">?</div>
       <div class="guide-text">
-        <h3>Questions</h3>
-        <p>Walk into question markers (?) to trigger quiz challenges</p>
+        <h3>Küsimused</h3>
+        <p>Kõnni küsimuste markeritesse (?), et vastata küsimustele</p>
       </div>
     </div>
 
     <div class="guide-card">
       <div class="guide-icon artifact-icon">✦</div>
       <div class="guide-text">
-        <h3>Artifacts</h3>
-        <p>Collect sword, shield, knife, dice, and gaming pieces to help you</p>
-        <p class="artifact-line">⚔ 50/50: Remove two wrong answers &nbsp;&nbsp;&nbsp; 🎲 Skip: Skip the current question</p>
+        <h3>Artefaktid</h3>
+        <p>Kogu mõõki, kilpe, nugasid, täringuid, ja muid esemeid</p>
       </div>
     </div>
 
-    <button id="readyBtn" class="ready-btn">I'M READY!</button>
+    <button id="readyBtn" class="ready-btn">Olen valmis!</button>
   </dialog>
 
+  <!--Login-->
   <dialog id="playDialog" class="play-dialog">
     <button id="closePlayBtn" class="play-close-btn" aria-label="Close play popup">✕</button>
 
-    <h2 class="play-title">Choose Your Path</h2>
-    <p class="play-subtitle">Select how you'd like to embark on your Viking journey</p>
+    <h2 class="play-title">Vali</h2>
+    <p class="play-subtitle">Kuidas tahaksid mängu mängida</p>
 
     <div class="mode-switch">
-      <button id="singleplayerTab" class="mode-btn active" type="button">👤 Singleplayer</button>
-      <button id="schoolModeTab" class="mode-btn" type="button">👥 School Mode</button>
+      <button id="singleplayerTab" class="mode-btn active" type="button">👤 Üksikmängija</button>
+      <button id="schoolModeTab" class="mode-btn" type="button">👥 Koolirežiim</button>
     </div>
 
     <form id="playForm" class="play-form">
-      <label for="vikingName" class="play-label">Viking Name</label>
-      <input id="vikingName" class="play-input" type="text" placeholder="Enter your name" />
+      <label for="vikingName" class="play-label">Viikingi nimi</label>
+      <input id="vikingName" class="play-input" type="text" placeholder="Sisesta oma nimi" />
 
       <div id="singleplayerFields">
-        <label for="password" class="play-label">Password</label>
-        <input id="password" class="play-input" type="password" placeholder="Enter your password" />
-        <p class="play-helper">Solo adventure through the islands</p>
+        <label for="password" class="play-label">Parool</label>
+        <input id="password" class="play-input" type="password" placeholder="Sisesta oma parool" />
       </div>
 
       <div id="schoolModeFields" hidden>
-        <label for="roomCode" class="play-label">Room Code</label>
-        <input id="roomCode" class="play-input" type="text" placeholder="Enter class code" />
-        <p class="play-helper">Join your class on this quest</p>
+        <label for="roomCode" class="play-label">Ruumikood</label>
+        <input id="roomCode" class="play-input" type="text" placeholder="Sisesta Ruumikood" />
       </div>
 
       <button id="startAdventureBtn" class="start-adventure-btn" type="submit">
-        Start Adventure
+        Alusta!
       </button>
     </form>
   </dialog>

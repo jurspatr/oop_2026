@@ -12,7 +12,12 @@ readyBtn === null || readyBtn === void 0 ? void 0 : readyBtn.addEventListener("c
     guideDialog === null || guideDialog === void 0 ? void 0 : guideDialog.close();
 });
 guideDialog === null || guideDialog === void 0 ? void 0 : guideDialog.addEventListener("click", function (event) {
-    if (event.target === guideDialog) {
+    var rect = guideDialog.getBoundingClientRect();
+    var clickedInside = event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+    if (!clickedInside) {
         guideDialog.close();
     }
 });

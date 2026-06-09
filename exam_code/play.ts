@@ -45,6 +45,7 @@ function updateStartButtonState(): void {
       : hasName && hasRoomCode;
 
   startAdventureBtn.classList.toggle("enabled", isValid);
+  startAdventureBtn.disabled = !isValid;
 }
 
 playBtn?.addEventListener("click", () => {
@@ -71,35 +72,27 @@ roomCode?.addEventListener("input", updateStartButtonState);
 playForm?.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const hasName = vikingName ? vikingName.value.trim().length > 0 : false;
-  const hasPassword = password ? password.value.trim().length > 0 : false;
-  const hasRoomCode = roomCode ? roomCode.value.trim().length > 0 : false;
+  const name = vikingName?.value.trim() ?? "";
+  const enteredPassword = password?.value.trim() ?? "";
+  const enteredRoomCode = roomCode?.value.trim() ?? "";
 
   const valid =
     currentMode === "singleplayer"
-      ? hasName && hasPassword
-      : hasName && hasRoomCode;
+      ? name.length > 0 && enteredPassword.length > 0
+      : name.length > 0 && enteredRoomCode.length > 0;
 
   if (!valid) return;
 
-  if (currentMode === "singleplayer") {
-    alert("Starting singleplayer adventure...");
-  } else {
-    alert("Joining school mode adventure...");
-  }
+  const params = new URLSearchParams({
+    name,
+    mode: currentMode
+  });
 
-  playDialog?.close();
+  window.location.href = `intro.html?${params.toString()}`;
 });
 
 playDialog?.addEventListener("click", (event: MouseEvent) => {
-  const rect = playDialog.getBoundingClientRect();
-  const clickedInside =
-    event.clientX >= rect.left &&
-    event.clientX <= rect.right &&
-    event.clientY >= rect.top &&
-    event.clientY <= rect.bottom;
-
-  if (!clickedInside) {
+  if (event.target === playDialog) {
     playDialog.close();
   }
 });

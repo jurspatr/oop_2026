@@ -16,14 +16,7 @@ readyBtn?.addEventListener("click", () => {
 });
 
 guideDialog?.addEventListener("click", (event: MouseEvent) => {
-  const rect = guideDialog.getBoundingClientRect();
-  const clickedInside =
-    event.clientX >= rect.left &&
-    event.clientX <= rect.right &&
-    event.clientY >= rect.top &&
-    event.clientY <= rect.bottom;
-
-  if (!clickedInside) {
+  if (event.target === guideDialog) {
     guideDialog.close();
   }
 });
